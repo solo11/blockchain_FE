@@ -1,0 +1,13 @@
+
+.label-file {
+    border: 1.5px solid grey;
+    border-radius: 12px;
+    display: inline-block;
+    margin: 5px;
+    padding: 7px;
+    cursor: pointer;
+}
+
+.input-file[type="file"] {
+    display: none;
+}
