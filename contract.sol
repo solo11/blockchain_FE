@@ -173,7 +173,7 @@ contract PhotoSharingNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable
 
     // returns the address of the owner
 
-    function getOwner(uint id) view public returns (address){
+    function getNFTOwner(uint id) view public returns (address){
         address owner_c = ERC721.ownerOf(id); 
         return owner_c;
     }
