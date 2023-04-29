@@ -164,9 +164,6 @@ contract PhotoSharingNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable
     // an uniqueness scale value is assgned to each post which appreciates or depriciates the nft value 
     // A backed function assigns the value by evaluating the post with the other posts for uniqueness
 
-    function assignUniqueScore(uint unique_score, uint tokenId) public onlyOwner {
-        posts[tokenId].uniqueScore = unique_score;
-    }
 
     // get all the data of a post given a token id
 
