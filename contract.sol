@@ -68,11 +68,7 @@ contract PhotoSharingNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable
         users[usr].user_name = name;
     }
 
-    function unregister() public {
-    address usr = msg.sender;       
-    registration[usr]= 0;
-    users[usr].user_name = "";
-    }
+
 
     function getUsername()  public view returns(string memory){
         if(registration[msg.sender] == 1){
