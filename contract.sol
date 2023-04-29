@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.9;
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
@@ -23,6 +23,8 @@ contract PhotoSharingNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable
         uint uniqueScore;
         uint timestamp;
         string description;
+        int bonus;
+        bool checked;
     }
 
     // define the structure of a user
@@ -30,7 +32,7 @@ contract PhotoSharingNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable
         string user_name;
     }
 
-    address owner;
+    address admin;
 
     mapping (address=>user) users;
     mapping (address=>uint) registration;
@@ -43,16 +45,18 @@ contract PhotoSharingNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable
     }
 
     modifier onlyOwner {
-        require(msg.sender == owner);
+        require(msg.sender == admin);
         _;
     }
+
+    event Uploaded(address user, uint tokenid);
 
     Counters.Counter private _tokenIdCounter;
 
     constructor() ERC721("PhotoSharingNFT", "STK") {
-        owner = msg.sender;
-        users[owner].user_name = "admin";
-        registration[owner]= 1;
+        admin = msg.sender;
+        users[admin].user_name = "admin";
+        registration[admin]= 1;
     }
 
     // A new user has to register 
@@ -88,17 +92,32 @@ contract PhotoSharingNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable
     // upload a new post, a user can upload the post by sending the uri of post metadata and name of the post
     // the post is added to the posts list
 
-    function uploadPost(string memory uri,string memory name, string memory description) public onlyUser returns(uint256){
+    function uploadPost(string memory uri,string memory name, string memory description) public onlyUser {
          uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, uri);
 
-        Post memory newPost = Post(name,msg.sender,uri,tokenId,0,false,0,block.timestamp,description);
+        Post memory newPost = Post(name,msg.sender,uri,tokenId,0,false,0,block.timestamp,description,0,false);
 
         posts.push(newPost);
 
-        return tokenId;
+        emit Uploaded(msg.sender,tokenId);
+
+
+    }
+
+
+    function appreciate(uint tokenid) public onlyUser{
+        require(msg.sender == posts[tokenid].owner,"Only owner can depreciate");
+        posts[tokenid].bonus = 5;
+        posts[tokenid].checked = true;
+    }
+
+    function depreciate(uint tokenid) public onlyUser{
+        require(msg.sender == posts[tokenid].owner,"Only owner can depreciate");
+        posts[tokenid].bonus = -5;
+        posts[tokenid].checked = true;
     }
 
     // toggle the post for sale or not 
@@ -163,6 +182,11 @@ contract PhotoSharingNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable
 
     function getOwner(uint id) view public returns (address){
         address owner_c = ERC721.ownerOf(id); 
+        return owner_c;
+    }
+
+    function getAdmin() view public returns (address){
+        address owner_c = admin; 
         return owner_c;
     }
 
